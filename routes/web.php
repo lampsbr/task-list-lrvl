@@ -1,6 +1,8 @@
 <?php
 
+use App\Http\Requests\TaskRequest;
 use Illuminate\Http\Response;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Models\Task;
 
@@ -13,13 +15,26 @@ Route::get('/tasks', function () {
     ]);
 })->name('tasks.index');
 
-Route::get('/tasks/{id}', function ($id) {
-    //$task = collect($tasks)->firstWhere('id', $id);
+Route::view('/tasks/create', 'create')->name('tasks.create');
 
+Route::get('/tasks/{task}', function (Task $task) {
     return view('show', [
-        'task' => \App\Models\Task::findOrFail($id),
+        'task' => $task,
     ]);
 })->name('tasks.show');
+
+Route::get('/tasks/{task}/edit', function (Task $task) {
+    return view('edit', [ 'task' => $task ]);
+})->name('tasks.edit');
+Route::post('/tasks', function (TaskRequest $req) {
+    $task = Task::create($req->validated());
+    return redirect()->route('tasks.show', [$task->id])->with('success', 'Task created successfully!');
+})->name('tasks.store');
+
+Route::put('/tasks/{task}', function (Task $task, TaskRequest $req) {
+    $task->update($req->validated());
+    return redirect()->route('tasks.show', [$task->id])->with('success', 'Task updated successfully!');
+})->name('tasks.update');
 
 Route::fallback(function () {
     return "Still got somewhere!";
