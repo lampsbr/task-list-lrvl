@@ -14,4 +14,9 @@ class Task extends Model
         'long_description',
     ];
     //protected $guarded = ['secret'];//considered less safe
+
+    public function toggleComplete(){
+        $this->completed = !$this->completed;
+        $this->save();
+    }
 }
